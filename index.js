@@ -10,10 +10,10 @@ app.use(express.json())
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 app.use(cors())
 
-morgan.token('body', function (req, res) {
-    if(req.method=== 'POST'){
-      return JSON.stringify(req.body) 
-    }
+morgan.token('body', function (req) {
+  if(req.method=== 'POST'){
+    return JSON.stringify(req.body)
+  }
 })
 
 app.get('/info', (req, res, next) => {
@@ -26,7 +26,6 @@ app.get('/info', (req, res, next) => {
       res.send(info)
     })
     .catch(error => next(error))
-  
 })
 
 app.get('/api/persons', (req, res) => {
@@ -36,32 +35,27 @@ app.get('/api/persons', (req, res) => {
 })
 
 app.get('/api/persons/:id', (req, res, next) => {
-  Person.findById(req.params.id)
-  .then(person => {
+  Person.findById(req.params.id).then(person => {
     if (person){
       res.send(person)
     } else {
       console.log('jou')
       res.status(404).end()
     }
-  })
-  .catch(error => next(error))
-
+  }).catch(error => next(error))
 })
 
 app.delete('/api/persons/:id', (req, res, next) => {
-  Person.findByIdAndDelete(req.params.id)
-  .then(person => {
+  Person.findByIdAndDelete(req.params.id).then(person => {
     if (person) {
       res.json(person.toJSON())
     } else {
       res.status(404).end()
     }
-  })
-  .catch(error => next(error))
+  }).catch(error => next(error))
 })
 
-app.put('/api/persons/:id', (req, res, next) =>{
+app.put('/api/persons/:id', (req, res, next) => {
   const body = req.body
 
   const person = {
@@ -93,7 +87,6 @@ app.post('/api/persons', (request, response, next) => {
   })
 
   console.log(newPerson)
-  
   newPerson.save()
     .then(savedPerson => {
       response.json(savedPerson.toJSON())
@@ -115,7 +108,7 @@ const errorHandler = (error, request, response, next) => {
 
 app.use(errorHandler)
 
-const PORT = process.env.PORT 
+const PORT = process.env.PORT
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
